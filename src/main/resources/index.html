@@ -7,8 +7,8 @@
 
     <script>
         var sse = new SSE("duplexsse");
-        sse.onMessage = function(msg) {
-          console.log(msg);
+        sse.onmessage = function(msg) {
+          console.log(msg.data);
           setTimeout(function(){
             sse.send("Number: " + Math.random());
           }, 1000);
