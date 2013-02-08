@@ -162,7 +162,7 @@ trait ServerSideEventsDirectives {
                 c ! RegisterClosedHandler( () => channelMapper !  UnregisterChannel(id) )
 
                 // Send the id and token to the client in json
-                c ! Message(s"""{ id: "$id", token: "$token" }""", "init")
+                c ! Message(s"""{ "id": "$id", "token": "$token" }""", "init")
 
                 // Call the custom open handler
                 openHandler(c)

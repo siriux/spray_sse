@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spray SSE</title>
+    <script type="text/javascript" src="eventsource.js"></script> <!-- Yaffle's event source polyfill -->
+    <script type="text/javascript" src="sse.js"></script>
+
+    <script>
+        var sse = new SSE("duplexsse");
+        sse.onMessage = function(msg) {
+          console.log(msg);
+          setTimeout(function(){
+            sse.send("Number: " + Math.random());
+          }, 1000);
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>

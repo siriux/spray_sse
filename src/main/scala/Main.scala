@@ -19,10 +19,16 @@ object Main extends App with SimpleRoutingApp {
   }})
 
   startServer(interface = "localhost", port = 8080) {
-      path("ssetest") {
+
+      rewriteUnmatchedPath(p => if (p == "/") "/index.html" else p) {
+        pathPrefix("") {
+          getFromResourceDirectory("")
+        }
+      } ~
+      path("sse") {
         respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
           sse { (channel, lastEventID) =>
-            // Register a closed event handler
+          // Register a closed event handler
             channel ! RegisterClosedHandler( () => println("Connection closed !!!") )
 
             // Use the channel
@@ -30,10 +36,11 @@ object Main extends App with SimpleRoutingApp {
           }
         }
       } ~
-      pathPrefix("duplexssetest") {
+      pathPrefix("duplexsse") {
         respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
           duplexSse { channel =>
             println("Connected")
+            channel ! RegisterClosedHandler( () => println("Connection closed !!!") )
             channel ! Message("A message")
           } onMessage { (channel, msg) =>
             channel ! Message(s"The message was: ${msg.data}")
