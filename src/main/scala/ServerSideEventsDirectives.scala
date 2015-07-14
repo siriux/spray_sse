@@ -1,10 +1,9 @@
-import spray.routing._
-import Directives._
 
 import spray.http._
+import spray.can.Http
+import spray.routing._
+import Directives._
 import HttpHeaders._
-import MediaTypes._
-import spray.can.server.HttpServer
 import akka.actor._
 import akka.pattern.ask
 import scala.concurrent.duration._
@@ -66,7 +65,7 @@ trait ServerSideEventsDirectives {
               case ReceiveTimeout =>
                 ctx.responder ! MessageChunk(":\n") // Comment to keep connection alive
               case RegisterClosedHandler(handler) => closedHandlers ::= handler
-              case HttpServer.Closed(_, reason) =>
+              case _: Http.ConnectionClosed =>
                 closedHandlers.foreach(_())
                 context.stop(self)
             }
@@ -78,7 +77,7 @@ trait ServerSideEventsDirectives {
     }
 
     get {
-      respondWithMediaType(CustomMediaType("text/event-stream")) { // TODO This should be a standard media type
+      respondWithMediaType(MediaType.custom("text/event-stream")) { // TODO This should be a standard media type
         lastEventId { lei =>
           sseRoute(lei)
         }
